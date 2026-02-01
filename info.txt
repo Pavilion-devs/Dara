@@ -1,0 +1,45 @@
+Cat | Solana Foundation, [Jan 13, 2026 at 11:29 PM]
+This is the topic for Anoncoin, who are sponsoring a $10,000 bounty! 
+
+Privacy Tooling for Launching Tokens
+
+Build confidential token creation infra for dynamic bonding, private swaps, dark liquidity pools. A seamless solution built to provide confidentiality to memecoin launches and make trading fun with privacy.
+
+Best overall: $5k
+Best integration into Anoncoin: $2.5k
+Most creative: $2.5k
+
+Talk directly with the Anoncoin team here
+
+Hey sorry for the delay. We were waiting few things to go live with some of the other sponsors like CSPL by Arcium.
+
+Here are some ideas you could work on:
+
+- A dark pool for memecoins to trade with privacy.
+- A privacy focused memecoin launched on Anoncoin launchpad that raises awareness about privacy via memetics
+- Verify users’ X, their follower count, followed by without doxxing their identity 
+- An anonymous social app built on top of X social graph
+- Helping creators pre buy their coin through anonymous distributed wallets  
+- Anonymous swaps for coins created on Anoncoin
+- Anonymous pre sale for a token launch
+
+
+Apologies for the major delay from our side. We’re sharing this now: teams can build privacy-first experiments around memecoins, social identity, and trading, enabling participation without doxxing users.
+
+1) Trading & Market Structure
+• Dark pool for memecoins: private intent / private execution so traders can buy/sell without leaking size, direction, or entry.
+• Anonymous swaps for Anoncoin-launched tokens: privacy-preserving swap UX that feels native for memecoins.
+• Anonymous presale / private launch mechanics: allow early participation without exposing wallets publicly. 
+
+2) Identity & Reputation
+• Verify X account + follower count without doxxing: prove “this user has X followers” (or meets criteria) without revealing identity or linking wallets.
+• Anonymous social app on top of X social graph: interact, post, and coordinate while keeping wallet/user identity unlinkable.
+
+3) Launch & Creator Tooling
+• Privacy-focused memecoin launch: a token launched on Anoncoin that spreads privacy awareness via memetics (fun + educational).
+• Anonymous distributed pre-buy for creators: help creators bootstrap liquidity/participation using distributed wallets to reduce doxxing / clustering.
+• Anonymous pre-buy rails: privacy-preserving flows for creators and early community members.
+
+API docs you can use to deploy coins: https://documenter.getpostman.com/view/9760632/2sBXVhEr4U#intro
+
+Feel free to go beyond these docs too, they’re just one entry point. You can also explore the other privacy facets we mentioned (trading infra like dark pools / private swaps, privacy-preserving X identity & reputation, anonymous social on X graph, distributed/anonymous pre-buys, and private presales).

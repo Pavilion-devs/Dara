@@ -1,0 +1,73 @@
+# Dependencies
+node_modules/
+
+# Rust / Cargo / Anchor
+target/
+.anchor/
+**/*.rs.bk
+test-ledger/
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+
+# Build outputs
+dist/
+build/
+out/
+.next/
+.vercel/
+
+# Next.js
+next-env.d.ts
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing & coverage
+coverage/
+.nyc_output/
+
+# Logs and debug
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+
+# IDE and editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Yarn
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Project-specific (excluded from repo)
+raffle-example-solana/
+ui-template/
+DEMO-GUIDE.md
+ventus-agency.aura.build-content.html
+
+# Misc
+*.local
+.cache/

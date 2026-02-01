@@ -1,0 +1,176 @@
+Anoncoin Third Party APIs
+Overview
+These are the Anoncoin Third Party APIs
+
+Read documentation carefully before you start api integration.
+
+Let us know if you have any suggestion to improve this documentation.
+
+API Host
+Dev Host: https://dev-api.dubdub.tv
+Prod Host: https://api.dubdub.tv
+
+SOLANA RPC:
+DEV RPC URL: https://api.devnet.solana.com
+PROD RPC URL: https://api.mainnet-beta.solana.com
+
+Authentication
+All authorized requests should be sent with the following headers:
+
+Authorization: API-KEY
+
+How to get the API Key
+Log in to your account at https://anoncoin.it
+
+Click on your profile avatar in the top-right
+
+Go to API Key
+
+Click Generate API Key
+
+API Responses
+Sample Response Format for Success
+Plain Text
+{
+    "status": "success"
+    "message": "Success message"
+    "data": {
+        /*data*/
+    },
+    "request_id": "UUID"
+}
+Sample Response Format for Failed
+Plain Text
+{
+    "status": "failed"
+    "message": "Failed message"
+    "error_code": null,
+    "data": null,
+    "request_id": "UUID"
+}
+Description of API Response Format
+View More
+Type	Description	Status	Message	Data	Error Code
+Success
+All went well, and (usually) some data was returned.
+success
+String
+Object or null
+Won't get
+Failed
+There was a problem with the data submitted, or some pre-condition of the API call wasn't satisfied.
+failed
+String
+Object or null
+Integer or null
+HTTP Status Code
+Description of API Server Responses:
+View More
+Code	Name	Details
+200
+OK
+the request was successful.
+202
+Accepted
+the request is accepted for processing, but the processing is not complete..
+400
+Bad Request
+the request could not be understood or was missing required parameters.
+401
+Unauthorized
+authentication failed or user doesn't have permissions for requested operation.
+404
+Not Found
+resource was not found.
+409
+Conflict
+resourse with given id already exist.
+429
+Too Many Requests
+user has sent too many requests in a given amount of time.
+500
+Internal Server Error
+server thrown error during processing.
+
+
+POST
+Create Token
+{{HOST}}/thirdParty/v1/createToken
+Creates a new token on the Solana blockchain.
+
+Success - Create Token
+javascript
+var myHeaders = new Headers();
+myHeaders.append("x-api-key", "anoncoin:xxxx");
+
+var formdata = new FormData();
+formdata.append("files", fileInput.files[0], "1eec0f62-7619-4b20-abf3-de18b41eb4eb");
+formdata.append("tickerName", "Thanos");
+formdata.append("tickerSymbol", "BOLD51");
+formdata.append("description", "Destroyed half of the world");
+formdata.append("twitterLink", "https://x.com/abc");
+formdata.append("telegramLink", "https://t.me/abc");
+formdata.append("royaltyUser", "anoncoinit");
+
+var requestOptions = {
+  method: 'POST',
+  headers: myHeaders,
+  body: formdata,
+  redirect: 'follow'
+};
+
+fetch("{{HOST}}/thirdParty/v1/createToken", requestOptions)
+  .then(response => response.text())
+  .then(result => console.log(result))
+  .catch(error => console.log('error', error));
+
+Response
+Success Response (when validateOnly is false or not provided)
+json
+{
+    "mintAddress": "token mint address",
+    "signedTransaction": "signed transaction in base 58 encoded string",
+    "blockhash": "blockhash in signed transaction",
+    "lastValidBlockHeight": "blockhash valid till block height",
+    "blockhashExpiresInSeconds": "blockhash expiry in seconds [number]"
+}
+Response Fields
+Field	Description
+mintAddress	The Solana token mint address for the new token
+signedTransaction	The signed transaction in base58 encoded string format, ready to be broadcast to the Solana network
+blockhash	The blockhash used for the transaction
+lastValidBlockHeight	The block height until which the transaction remains valid
+blockhashExpiresInSeconds	Time in seconds until the blockhash expires (typically 50-60 seconds)
+HEADERS
+x-api-key
+anoncoin:xxxx
+
+Anoncoin API Key
+
+Body
+formdata
+files
+tickerName
+Thanos
+
+tickerSymbol
+BOLD51
+
+description
+Destroyed half of the world
+
+twitterLink
+https://x.com/abc
+
+telegramLink
+https://t.me/abc
+
+royaltyUser
+anoncoinit
+
+X username for 100% Fees assigned
+
+validateOnly
+true
+
+Pass this as true when you want to run validation only, default: false
