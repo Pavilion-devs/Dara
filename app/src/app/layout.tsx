@@ -3,8 +3,8 @@ import "./globals.css";
 import { Wallet } from "@/components/wallet-provider";
 
 export const metadata: Metadata = {
-  title: "AnonPresale - Anonymous Token Presales on Solana",
-  description: "Privacy-preserving presale platform. Commit anonymously, claim privately.",
+  title: "Dara - Privacy Toolkit for Solana",
+  description: "Anonymous swaps, stealth token launches, AI risk analysis, and stealth wallet management on Solana mainnet.",
 };
 
 export default function RootLayout({

@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Shield, Eye, Zap, Lock, Users, Globe } from "lucide-react";
+import { ArrowRight, Shield, Eye, Lock, Brain, Wallet, Globe, Repeat } from "lucide-react";
 
 export default function LandingPage() {
   const { connected } = useWallet();
@@ -12,10 +12,9 @@ export default function LandingPage() {
   const router = useRouter();
   const footerTextRef = useRef<HTMLHeadingElement>(null);
 
-  // Redirect to dashboard if already connected
   useEffect(() => {
     if (connected) {
-      router.push("/dashboard");
+      router.push("/swap");
     }
   }, [connected, router]);
 
@@ -57,17 +56,16 @@ export default function LandingPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end mb-12">
           <div className="lg:col-span-7 reveal active">
             <h1 className="md:text-7xl lg:text-8xl leading-[1.05] text-5xl font-semibold tracking-tighter">
-              Anonymous
+              Privacy
               <br />
-              Token
+              Toolkit for
               <br />
-              <span className="text-indigo-500">Presales</span>
+              <span className="text-indigo-500">Solana</span>
             </h1>
           </div>
           <div className="lg:col-span-5 flex flex-col items-start lg:items-end lg:pl-10 reveal delay-100 active">
             <p className="text-lg md:text-xl text-neutral-600 mb-8 max-w-sm lg:text-right font-medium">
-              Privacy-preserving presale platform on Solana. Commit anonymously,
-              claim privately.
+              Anonymous swaps, stealth token launches, and AI-powered risk analysis. Your wallet never touches the trade.
             </p>
             <button
               onClick={() => setVisible(true)}
@@ -86,45 +84,29 @@ export default function LandingPage() {
           <div className="absolute inset-0 bg-gradient-to-br from-indigo-50 via-white to-neutral-50" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,rgba(99,102,241,0.08),transparent_60%)]" />
 
-          {/* Floating cards */}
+          {/* Floating card */}
           <div className="absolute bottom-8 left-8 md:bottom-12 md:left-12 bg-white/95 backdrop-blur-xl p-6 rounded-2xl shadow-2xl max-w-sm w-full hidden md:block border border-white/50">
             <div className="flex justify-between items-start mb-4">
               <div>
                 <p className="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold mb-1">
-                  Active Presale
+                  Anonymous Swap
                 </p>
                 <h4 className="text-sm font-bold text-neutral-900">
-                  $ANON Token Launch
+                  SOL → Token via Relayer
                 </h4>
               </div>
               <div className="bg-emerald-100 text-emerald-700 border border-emerald-200 text-[10px] px-2 py-0.5 rounded-full font-semibold flex items-center gap-1">
                 <span className="w-1 h-1 rounded-full bg-emerald-600 animate-pulse" />
-                Live
-              </div>
-            </div>
-            <div className="flex items-center justify-between mb-5">
-              <div className="flex -space-x-2">
-                <div className="w-8 h-8 rounded-full bg-indigo-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-indigo-600">
-                  ??
-                </div>
-                <div className="w-8 h-8 rounded-full bg-neutral-800 border-2 border-white flex items-center justify-center text-[10px] font-bold text-white">
-                  ??
-                </div>
-                <div className="w-8 h-8 rounded-full bg-neutral-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-neutral-600">
-                  +?
-                </div>
-              </div>
-              <div className="text-xs text-neutral-500 font-medium">
-                Anonymous participants
+                Mainnet
               </div>
             </div>
             <div className="space-y-1.5">
               <div className="flex justify-between text-[11px] font-medium text-neutral-600">
-                <span>Raised</span>
-                <span>67%</span>
+                <span>Your wallet hidden</span>
+                <span className="text-indigo-500">100%</span>
               </div>
               <div className="h-1.5 w-full bg-neutral-100 rounded-full overflow-hidden">
-                <div className="h-full bg-indigo-500 w-[67%] rounded-full" />
+                <div className="h-full bg-indigo-500 w-full rounded-full" />
               </div>
             </div>
           </div>
@@ -134,10 +116,10 @@ export default function LandingPage() {
             <Shield className="w-5 h-5 text-indigo-500" />
             <div>
               <p className="text-xs font-semibold text-neutral-900">
-                Commit-Reveal Privacy
+                Relayer Privacy
               </p>
               <p className="text-[10px] text-neutral-500">
-                Unlinkable deposits & claims
+                Your wallet never in swap tx
               </p>
             </div>
           </div>
@@ -157,7 +139,7 @@ export default function LandingPage() {
 
       <div className="w-full h-px bg-gradient-to-r from-transparent via-neutral-200 to-transparent my-16 opacity-50" />
 
-      {/* How It Works - Dark Section */}
+      {/* How It Works */}
       <section className="rounded-[2rem] md:rounded-[3rem] bg-[#111111] text-white p-8 md:p-16 lg:p-24 overflow-hidden relative reveal">
         <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-900/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 relative z-10">
@@ -167,64 +149,56 @@ export default function LandingPage() {
               How It Works
             </div>
             <h2 className="text-5xl md:text-7xl font-semibold tracking-tighter leading-tight mb-8">
-              Commit.
+              Deposit.
               <span className="flex items-center gap-4 text-neutral-500">
                 <Eye className="w-12 h-12 md:w-16 md:h-16 stroke-[1.5]" />
-                Reveal.
+                Relay.
               </span>
-              Claim.
+              Receive.
             </h2>
             <p className="text-xl md:text-2xl text-neutral-400 max-w-md leading-relaxed">
-              Use a burner wallet to commit SOL with a hashed secret. After the
-              presale ends, reveal your secret to claim tokens to a completely
-              separate wallet.
+              Deposit SOL to the relayer. It executes the swap — your wallet never appears in the trade. Tokens land in a fresh stealth wallet.
             </p>
           </div>
           <div className="relative mt-8 lg:mt-0">
             <div className="bg-[#1A1A1A] border border-neutral-800 rounded-2xl p-6 md:p-8 shadow-2xl">
               <div className="space-y-6">
-                {/* Step 1 */}
                 <div className="flex gap-4 items-start">
                   <div className="w-10 h-10 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-sm font-bold shrink-0">
                     1
                   </div>
                   <div>
                     <h4 className="font-semibold text-white mb-1">
-                      Generate Burner Wallet
+                      Deposit SOL to Relayer
                     </h4>
                     <p className="text-neutral-500 text-sm">
-                      A fresh keypair is created in your browser. Fund it with
-                      SOL from your main wallet.
+                      Send SOL to the relayer address. This is the only on-chain link to your wallet.
                     </p>
                   </div>
                 </div>
-                {/* Step 2 */}
                 <div className="flex gap-4 items-start">
                   <div className="w-10 h-10 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-sm font-bold shrink-0">
                     2
                   </div>
                   <div>
                     <h4 className="font-semibold text-white mb-1">
-                      Commit Anonymously
+                      Relayer Executes Swap
                     </h4>
                     <p className="text-neutral-500 text-sm">
-                      Your burner signs the transaction with a commitment hash.
-                      No link to your real wallet on-chain.
+                      Jupiter swap happens from the relayer wallet. Your address is nowhere in the swap transaction.
                     </p>
                   </div>
                 </div>
-                {/* Step 3 */}
                 <div className="flex gap-4 items-start">
                   <div className="w-10 h-10 rounded-full bg-indigo-500/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 text-sm font-bold shrink-0">
                     3
                   </div>
                   <div>
                     <h4 className="font-semibold text-white mb-1">
-                      Claim to Fresh Wallet
+                      Tokens to Stealth Wallet
                     </h4>
                     <p className="text-neutral-500 text-sm">
-                      Reveal your secret and claim tokens to any wallet. The
-                      chain can&apos;t link your deposit to your claim.
+                      Swapped tokens transfer to a fresh keypair. Import the private key to Phantom to access your tokens.
                     </p>
                   </div>
                 </div>
@@ -232,14 +206,14 @@ export default function LandingPage() {
 
               <div className="mt-8 bg-[#222] rounded-xl p-6 border border-neutral-700">
                 <div className="flex justify-between text-xs font-medium text-neutral-500 mb-4">
-                  <span className="text-white">Privacy Guarantee</span>
-                  <span>Solana Devnet</span>
+                  <span className="text-white">Privacy Architecture</span>
+                  <span>Solana Mainnet</span>
                 </div>
                 <div className="text-4xl font-mono text-white mb-2 text-center tracking-widest font-light">
-                  SHA-256
+                  RELAYER
                 </div>
                 <div className="text-neutral-500 text-sm mb-6 text-center">
-                  Commitment Hash Scheme
+                  Wallet Isolation via Server-Side Execution
                 </div>
                 <button
                   onClick={() => setVisible(true)}
@@ -263,64 +237,78 @@ export default function LandingPage() {
               Features
             </div>
             <h2 className="md:text-5xl lg:text-6xl leading-[1.1] text-4xl font-semibold text-neutral-900 tracking-tighter">
-              Privacy-first token launches on Solana.
+              Everything you need for on-chain privacy.
             </h2>
           </div>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
           <div className="relative bg-indigo-100 rounded-3xl p-8 flex flex-col min-h-[320px] hover:scale-[1.01] transition-transform duration-300">
             <div className="flex items-center gap-2 mb-2">
-              <Shield className="w-5 h-5 text-indigo-700" />
+              <Repeat className="w-5 h-5 text-indigo-700" />
               <span className="text-sm font-medium text-neutral-800">
-                Anonymous Commits
+                Anonymous Swaps
               </span>
             </div>
             <p className="text-neutral-600 text-sm mt-2 max-w-xs">
-              Use burner wallets with commitment hashes. Your identity stays
-              hidden throughout the presale.
+              Jupiter swaps executed via relayer. Your wallet never appears in the swap transaction on-chain.
             </p>
             <div className="text-5xl md:text-6xl font-semibold text-black tracking-tighter mb-1 mt-auto">
               Zero
               <span className="text-sm font-sans font-medium tracking-normal align-middle opacity-60 ml-2">
-                IDENTITY LEAK
+                WALLET EXPOSURE
               </span>
             </div>
           </div>
           <div className="bg-neutral-50 rounded-3xl p-8 flex flex-col min-h-[320px] hover:bg-neutral-100 transition-colors duration-300">
             <div className="flex items-center gap-2 mb-2">
-              <Zap className="w-5 h-5 text-neutral-600" />
+              <Brain className="w-5 h-5 text-neutral-600" />
               <span className="text-sm font-medium text-neutral-600">
-                Anoncoin Integration
+                AI Risk Analysis
               </span>
             </div>
             <p className="text-neutral-500 text-sm mt-2 max-w-xs">
-              Create tokens directly via Anoncoin&apos;s API. One-click launch
-              with automatic presale setup.
+              GPT-powered rug-pull detection. Analyzes holder concentration, mint authority, and freeze risk before you swap.
             </p>
             <div className="text-5xl md:text-6xl font-semibold text-black tracking-tighter mb-1 mt-auto">
-              1-Click
+              AI
               <span className="text-sm font-sans font-medium tracking-normal align-middle opacity-60 ml-2">
-                TOKEN LAUNCH
+                RUG DETECTION
               </span>
             </div>
           </div>
           <div className="bg-neutral-50 rounded-3xl p-8 flex flex-col min-h-[320px] hover:bg-neutral-100 transition-colors duration-300">
             <div className="flex items-center gap-2 mb-2">
-              <Users className="w-5 h-5 text-neutral-600" />
+              <Wallet className="w-5 h-5 text-neutral-600" />
               <span className="text-sm font-medium text-neutral-600">
-                Social Gating
+                Stealth Wallet Manager
               </span>
             </div>
             <p className="text-neutral-500 text-sm mt-2 max-w-xs">
-              Optional Twitter verification to ensure real community
-              participation while preserving on-chain privacy.
+              Full UI to manage stealth wallets with balances, sweep all tokens, export keys, and import to Phantom.
             </p>
             <div className="text-5xl md:text-6xl font-semibold text-black tracking-tighter mb-1 mt-auto">
-              Sybil
+              Full
               <span className="text-sm font-sans font-medium tracking-normal align-middle opacity-60 ml-2">
-                RESISTANT
+                WALLET CONTROL
               </span>
             </div>
+          </div>
+        </div>
+        <div className="bg-neutral-50 rounded-3xl p-8 flex flex-col min-h-[200px] hover:bg-neutral-100 transition-colors duration-300">
+          <div className="flex items-center gap-2 mb-2">
+            <Shield className="w-5 h-5 text-neutral-600" />
+            <span className="text-sm font-medium text-neutral-600">
+              Stealth Token Launch + Pre-Buy
+            </span>
+          </div>
+          <p className="text-neutral-500 text-sm mt-2 max-w-lg">
+            Create a token via Anoncoin API and immediately distribute pre-buys across multiple stealth wallets. Distributed holding from block zero.
+          </p>
+          <div className="text-5xl md:text-6xl font-semibold text-black tracking-tighter mb-1 mt-auto">
+            Launch
+            <span className="text-sm font-sans font-medium tracking-normal align-middle opacity-60 ml-2">
+              + STEALTH PRE-BUY
+            </span>
           </div>
         </div>
       </section>
@@ -336,8 +324,7 @@ export default function LandingPage() {
               Go Private?
             </h2>
             <p className="text-neutral-400 text-lg md:text-xl mb-10 max-w-lg leading-relaxed">
-              Launch your token presale with built-in anonymity. No KYC, no
-              tracking, just cryptographic privacy guarantees.
+              Swap anonymously, launch tokens into stealth wallets, and let AI protect you from rug-pulls. All on Solana mainnet.
             </p>
             <div className="flex flex-col md:flex-row items-center gap-4 w-full justify-center">
               <button
@@ -346,14 +333,12 @@ export default function LandingPage() {
               >
                 Connect Wallet
               </button>
-              <a
-                href="https://github.com"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => router.push("/swap")}
                 className="px-10 py-4 bg-transparent border border-neutral-700 text-white rounded-full text-base font-semibold hover:border-white transition-all duration-300 min-w-[200px]"
               >
-                View Source
-              </a>
+                Try Anonymous Swap
+              </button>
             </div>
           </div>
         </div>
@@ -367,7 +352,7 @@ export default function LandingPage() {
             className="text-[15vw] leading-[0.8] uppercase whitespace-nowrap select-none transition-transform duration-75 will-change-transform font-bold text-black tracking-tighter"
             style={{ transform: "translateX(0)" }}
           >
-            AnonPresale Protocol
+            Dara Protocol
           </h1>
         </div>
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mt-8 gap-6 pb-12 reveal">
@@ -380,10 +365,10 @@ export default function LandingPage() {
             </div>
           </div>
           <div className="text-sm font-medium text-neutral-500">
-            Built for the Anoncoin Hackathon on Solana Devnet
+            Built for the Anoncoin Hackathon on Solana Mainnet
           </div>
           <div className="text-sm font-medium text-neutral-400">
-            Powered by Anoncoin
+            Powered by Anoncoin + Jupiter + OpenAI
           </div>
         </div>
       </section>

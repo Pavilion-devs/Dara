@@ -20,16 +20,19 @@ export default function Navbar() {
         href="/"
         className="text-xl font-semibold tracking-tight cursor-pointer hover:opacity-70 transition-opacity"
       >
-        Anon<span className="text-indigo-500">Presale</span>
+        Da<span className="text-indigo-500">ra</span>
       </Link>
       <div className="flex items-center gap-8">
         {connected && (
           <div className="hidden md:flex gap-6 text-sm font-medium text-neutral-600">
-            <Link href="/dashboard" className="hover:text-black transition-colors">
-              Dashboard
+            <Link href="/swap" className="hover:text-black transition-colors">
+              Swap
             </Link>
-            <Link href="/create" className="hover:text-black transition-colors">
-              Create
+            <Link href="/launch" className="hover:text-black transition-colors">
+              Launch
+            </Link>
+            <Link href="/wallets" className="hover:text-black transition-colors">
+              Wallets
             </Link>
           </div>
         )}

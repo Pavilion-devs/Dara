@@ -65,8 +65,12 @@ ehthumbs.db
 # Project-specific (excluded from repo)
 raffle-example-solana/
 ui-template/
+shadowfi/
 DEMO-GUIDE.md
 ventus-agency.aura.build-content.html
+docs.txt
+info.txt
+form.txt
 
 # Misc
 *.local

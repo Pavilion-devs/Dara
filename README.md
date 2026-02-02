@@ -1,111 +1,81 @@
-# AnonPresale Protocol
+# Dara — Privacy Toolkit for Solana
 
-Privacy-preserving token presale platform on Solana. Commit SOL anonymously via burner wallets, claim tokens to an unlinked wallet. On-chain observers cannot connect your deposit to your claim.
+Dara is a mainnet Solana privacy toolkit that breaks the on-chain link between your wallet and your trades. Swap tokens anonymously via a server-side relayer, launch tokens with distributed stealth pre-buys, and let AI warn you before you swap into a rug-pull.
 
-**Network:** Solana Devnet
-**Program ID:** `Hd5LcuhcSQ7aHqoyGhJSS6dokyptfBhNJXTvDQhfhxkj`
+**Network:** Solana Mainnet
 
 ---
 
 ## How It Works
 
-AnonPresale uses a **commit-reveal scheme** to break the on-chain link between depositors and token claimers:
-
 ```
-1. GENERATE  →  Fresh burner keypair created in browser
-2. COMMIT    →  Burner deposits SOL + SHA-256(secret || claim_wallet) on-chain
-3. FINALIZE  →  Creator ends presale, withdraws raised SOL
-4. CLAIM     →  Reveal secret → program verifies hash → tokens sent to claim wallet
+User Wallet (Phantom/Solflare)
+    |
+    | 1. Deposits SOL to relayer
+    v
+Next.js API Routes (relayer logic)
+    |
+    |-- Anoncoin API (token creation)
+    |-- Jupiter API (swap execution)
+    |-- OpenAI API (risk analysis)
+    v
+Relayer Wallet (server-side keypair)
+    |
+    | 2. Executes Jupiter swap (user wallet NOT in tx)
+    | 3. Transfers tokens to stealth wallet ATA
+    v
+Stealth Wallet (fresh Keypair)
+    |
+    User imports private key to Phantom
 ```
 
-The commitment hash `SHA-256(secret || claim_wallet_pubkey)` is stored on-chain during deposit. Since the hash is one-way, observers cannot derive the claim wallet from the commitment. At claim time, the user reveals the secret and claim wallet — the program recomputes the hash to verify, then sends pro-rata tokens to the claim wallet.
+Your wallet sends SOL to the relayer. The relayer executes the Jupiter swap from its own keypair — your address never appears in the swap transaction. Swapped tokens are transferred to a freshly generated stealth wallet. Import the private key to Phantom to access your tokens.
 
-**Result:** The burner wallet that deposited SOL and the wallet that receives tokens are cryptographically unlinkable on-chain.
+---
+
+## Features
+
+### Anonymous Swap
+Jupiter swaps executed via a server-side relayer. Your connected wallet deposits SOL, but the actual swap transaction only contains the relayer's address. Tokens land in a fresh stealth wallet.
+
+### Stealth Token Launch + Pre-Buy
+Create a token via the Anoncoin API and immediately execute distributed pre-buys across 1-5 stealth wallets. Each wallet gets its own keypair — distributed holding from block zero.
+
+### AI Token Risk Analysis
+Before you swap, Dara fetches on-chain data (holder concentration, mint authority, freeze authority, supply distribution) and runs it through GPT-4o-mini for a risk assessment. Flags rug-pull indicators and blocks swaps on tokens scoring 90+ risk.
+
+### Stealth Wallet Manager
+Full UI for managing stealth wallets — view SOL and token balances, copy/reveal private keys, sweep all assets to a destination, import external wallets, and export keys for Phantom import. Not just a text dump of private keys.
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────┐
-│  Next.js Frontend (React 19 + Tailwind CSS 4)       │
-│  ┌──────────┐  ┌──────────┐  ┌───────────────────┐  │
-│  │ Landing   │  │ Create   │  │ Presale Detail    │  │
-│  │ /         │  │ /create  │  │ /presale/[id]     │  │
-│  └──────────┘  └──────────┘  └───────────────────┘  │
-│         │              │               │             │
-│         └──────────────┼───────────────┘             │
-│                        │                             │
-│              Wallet Adapter (Phantom, Solflare)      │
-│              Burner Keypair (browser-generated)      │
-└────────────────────────┬────────────────────────────┘
-                         │
-                         ▼
-┌─────────────────────────────────────────────────────┐
-│  Solana Devnet — Anchor Program (anon_presale)      │
-│                                                     │
-│  initialize_presale  →  Create presale + token vault│
-│  commit_to_presale   →  Burner deposits SOL + hash  │
-│  finalize_presale    →  Creator withdraws SOL       │
-│  claim_tokens        →  Verify secret, send tokens  │
-│                                                     │
-│  PDAs:                                              │
-│  • Presale      ["presale", mint, creator]          │
-│  • Commitment   ["commitment", presale, hash]       │
-│  • TokenVault   ["token_vault", presale]            │
-│  • VaultAuth    ["vault_auth", presale]             │
-└─────────────────────────────────────────────────────┘
+app/
+├── src/app/
+│   ├── page.tsx                       # Landing page
+│   ├── layout.tsx                     # Root layout + wallet providers
+│   ├── swap/page.tsx                  # Anonymous swap UI
+│   ├── launch/page.tsx                # Token launch + pre-buy wizard
+│   ├── wallets/page.tsx               # Stealth wallet manager
+│   └── api/
+│       ├── swap/quote/route.ts        # Jupiter quote proxy
+│       ├── swap/execute/route.ts      # Relayer swap execution
+│       ├── launch/prebuy/route.ts     # Token creation + distributed pre-buy
+│       └── analyze/route.ts           # AI token risk analysis
+├── src/components/
+│   ├── navbar.tsx
+│   ├── wallet-button.tsx
+│   └── wallet-provider.tsx
+└── src/lib/
+    ├── constants.ts                   # Mainnet config
+    ├── relayer.ts                     # Server-side relayer keypair + tx helpers
+    ├── stealth.ts                     # Stealth wallet generation + localStorage
+    └── jupiter.ts                     # Jupiter quote/swap/transfer helpers
 ```
 
----
-
-## Features
-
-- **Anonymous Commits** — Burner wallets with commitment hashes. No identity leak on-chain.
-- **Commit-Reveal Privacy** — SHA-256 binding between secret and claim wallet. Unlinkable deposits and claims.
-- **Pro-Rata Distribution** — Tokens distributed proportionally to each participant's SOL contribution.
-- **Hard Cap Enforcement** — On-chain constraint prevents exceeding the presale cap.
-- **Time-Bounded Presales** — Start/end times enforced by the program. Live countdown in the UI.
-- **Double-Claim Protection** — Each commitment can only be claimed once (on-chain `is_claimed` flag).
-- **Burner Wallet Management** — Generate, fund, and use burner keypairs entirely in the browser.
-- **Data Persistence** — Presale metadata stored server-side in JSON. On-chain data fetched directly from Solana.
-
----
-
-## On-Chain Program
-
-Built with **Anchor 0.31.1**. Four instructions:
-
-| Instruction | Signer | Description |
-|---|---|---|
-| `initialize_presale` | Creator | Sets hard cap, token allocation, time window. Transfers tokens into vault PDA. |
-| `commit_to_presale` | Burner (participant) | Deposits SOL + commitment hash into presale PDA. Creates Commitment account. |
-| `finalize_presale` | Creator | Ends presale after time expires or hard cap reached. Transfers raised SOL to creator. |
-| `claim_tokens` | Any wallet | Reveals secret to prove ownership of commitment. Tokens sent to claim wallet's ATA. |
-
-### Account Structures
-
-**Presale** — stores presale configuration and state:
-- `creator`, `mint`, `hard_cap`, `tokens_for_sale`
-- `start_time`, `end_time`, `total_sol_committed`
-- `is_finalized`, `commitment_count`
-
-**Commitment** — stores each anonymous deposit:
-- `presale`, `commitment_hash` (32 bytes), `sol_amount`
-- `is_claimed`, `bump`
-
-### Error Codes
-
-| Code | Name | Trigger |
-|---|---|---|
-| 6000 | NotStarted | Commit before start_time |
-| 6001 | Ended | Commit after end_time |
-| 6002 | AlreadyFinalized | Action on finalized presale |
-| 6003 | HardCapExceeded | Commit would exceed cap |
-| 6004 | PresaleStillActive | Finalize before end/cap |
-| 6005 | NotFinalized | Claim before finalization |
-| 6006 | AlreadyClaimed | Double claim attempt |
-| 6007 | InvalidProof | Wrong secret for commitment |
+No custom Solana program required. No database. localStorage for stealth wallet data, server-side relayer for swap execution.
 
 ---
 
@@ -113,46 +83,13 @@ Built with **Anchor 0.31.1**. Four instructions:
 
 | Layer | Technology |
 |---|---|
-| Smart Contract | Rust, Anchor 0.31.1, anchor-spl (associated_token) |
-| Frontend | Next.js 16.1.1, React 19, Tailwind CSS 4 |
-| Wallet | @solana/wallet-adapter (Phantom, Solflare, Backpack) |
-| Crypto | @noble/hashes (SHA-256), bs58 |
-| Solana | @solana/web3.js 1.98, @coral-xyz/anchor 0.32.1 |
-| Network | Solana Devnet |
-
----
-
-## Project Structure
-
-```
-anoncoin/
-├── programs/anon-presale/
-│   └── src/lib.rs                  # Anchor program (4 instructions, 2 accounts)
-├── tests/
-│   └── anon-presale.ts             # 10 integration tests (full lifecycle)
-├── app/
-│   ├── src/app/
-│   │   ├── page.tsx                # Landing page
-│   │   ├── layout.tsx              # Root layout + wallet providers
-│   │   ├── dashboard/page.tsx      # Presale list + wallet info
-│   │   ├── create/page.tsx         # Token creation + presale setup wizard
-│   │   ├── presale/[id]/page.tsx   # Presale detail + commit/claim UI
-│   │   └── api/
-│   │       ├── presales/route.ts   # Presale metadata CRUD
-│   │       └── create-token/route.ts # Anoncoin API proxy
-│   ├── src/components/
-│   │   ├── navbar.tsx
-│   │   ├── wallet-button.tsx
-│   │   └── wallet-provider.tsx
-│   ├── src/hooks/
-│   │   └── useProgram.ts           # Anchor program hook
-│   └── src/lib/
-│       ├── program.ts              # Program ID + PDA helpers
-│       ├── idl.json                # Generated IDL
-│       └── burner.ts               # Burner keypair + hash utilities
-├── Anchor.toml
-└── README.md
-```
+| Frontend | Next.js 16, React 19, Tailwind CSS 4 |
+| Wallet | @solana/wallet-adapter (Phantom, Solflare) |
+| Blockchain | @solana/web3.js, @solana/spl-token |
+| Swap | Jupiter Aggregator V6 API |
+| Token Creation | Anoncoin Third-Party API |
+| AI Analysis | OpenAI GPT-4o-mini |
+| Network | Solana Mainnet |
 
 ---
 
@@ -161,79 +98,66 @@ anoncoin/
 ### Prerequisites
 
 - Node.js 18+
-- Rust + Cargo
-- Solana CLI (`solana`, `spl-token`)
-- Anchor CLI 0.31.1
+- A Solana wallet (Phantom or Solflare)
+- A funded relayer wallet (~0.02 SOL for gas)
 
-### 1. Clone and Install
-
-```bash
-cd anoncoin
-yarn install
-cd app && npm install && cd ..
-```
-
-### 2. Configure Solana CLI
+### 1. Install
 
 ```bash
-solana config set --url devnet
-solana airdrop 5
+cd app
+npm install
 ```
 
-### 3. Build and Deploy Program
+### 2. Configure Environment
 
-```bash
-anchor build
-anchor deploy
+Edit `app/.env`:
+
+```
+ANON_API_KEY=<your anoncoin api key>
+NEXT_PUBLIC_SOLANA_RPC_URL=https://api.mainnet-beta.solana.com
+NEXT_PUBLIC_RELAYER_ADDRESS=<relayer wallet public key>
+RELAYER_PRIVATE_KEY=<relayer wallet base58 private key>
+OPENAI_API_KEY=<openai api key>
 ```
 
-The program is already deployed at `Hd5LcuhcSQ7aHqoyGhJSS6dokyptfBhNJXTvDQhfhxkj`.
+The relayer wallet needs ~0.003 SOL per swap for gas and ATA creation. With 0.02 SOL you get ~6 demo transactions.
 
-### 4. Run Tests
-
-```bash
-anchor test --skip-local-validator
-```
-
-All 10 tests pass — covering initialization, commits, hard cap enforcement, finalization, claims, double-claim prevention, and invalid proof rejection.
-
-### 5. Start Frontend
+### 3. Run
 
 ```bash
 cd app
 npm run dev
 ```
 
-Open `http://localhost:3000` and connect a Solana wallet (Phantom or Solflare) on devnet.
+Open `http://localhost:3000` and connect a Solana wallet on mainnet.
 
 ---
 
-## Usage Flow
+## Usage
 
-### Creating a Presale
+### Anonymous Swap
 
-1. Navigate to `/create`
-2. Select **"Use Existing Mint"** and enter your SPL token mint address
-3. Configure: token name, symbol, hard cap (SOL), tokens for sale, duration
-4. Click **Initialize Anonymous Presale** and approve the transaction
+1. Navigate to `/swap`
+2. Enter the token mint address — AI risk analysis loads automatically
+3. Enter SOL amount — live Jupiter quote appears
+4. Click "Swap Anonymously" — approve the SOL deposit to relayer
+5. Relayer executes the swap and transfers tokens to a stealth wallet
+6. Save the stealth wallet to the wallet manager
 
-### Committing SOL (Anonymous)
+### Stealth Token Launch
 
-1. Open the presale detail page
-2. Enter a **fresh claim wallet address** (not your connected wallet)
-3. Set the SOL amount and click **Generate Burner Wallet**
-4. Click **Fund Burner** to send SOL from your main wallet to the burner
-5. Click **Commit Anonymously** — the burner signs the transaction
+1. Navigate to `/launch`
+2. Fill in token details (name, symbol, description, socials)
+3. Configure pre-buy: total SOL and number of stealth wallets (1-5)
+4. Approve the deposit — token creation and distributed pre-buys execute
+5. All stealth wallet keys are displayed and can be saved to the manager
 
-At this point, the on-chain record shows: *burner wallet X deposited Y SOL with hash Z*. No link to your main wallet or claim wallet.
+### Wallet Manager
 
-### Claiming Tokens
-
-1. After the presale is finalized, the claim section appears
-2. Click **Auto-fill secret & claim wallet** (or enter manually)
-3. Click **Claim Tokens** — tokens are sent to your claim wallet
-
-The program verifies `SHA-256(secret || claim_wallet) == stored_hash`, then transfers pro-rata tokens. The claim wallet receives tokens with no on-chain link to the depositing burner.
+1. Navigate to `/wallets`
+2. View all stealth wallets with live SOL and token balances
+3. Actions: reveal/copy private key, sweep all assets, import external wallets
+4. Follow the Phantom import instructions to access tokens in your mobile wallet
 
 ---
 
@@ -241,36 +165,14 @@ The program verifies `SHA-256(secret || claim_wallet) == stored_hash`, then tran
 
 | What's public on-chain | What's private |
 |---|---|
-| Burner wallet address | Link between burner and main wallet |
-| SOL amount committed | Link between burner and claim wallet |
-| Commitment hash (opaque) | The secret (stored in browser only) |
-| Claim wallet received tokens | Who owns the claim wallet |
+| User deposits SOL to relayer address | What the SOL was used to buy |
+| Relayer swaps on Jupiter | Who initiated the swap |
+| Stealth wallet receives tokens | Link between user wallet and stealth wallet |
 
-**Threat model:** An observer watching the blockchain sees burner A deposited SOL, and later wallet B received tokens. They cannot prove A and B belong to the same person — the commitment hash is a one-way function, and the secret never appears on-chain until claim time (at which point it only proves the mathematical relationship, not identity).
-
----
-
-## Tests
-
-10 integration tests verify the full lifecycle:
-
-```
-  anon-presale
-    ✓ Initializes a presale
-    ✓ Burner wallet commits SOL to presale
-    ✓ Cannot commit more than hard cap
-    ✓ Cannot finalize before end time (cap not reached)
-    ✓ Cannot claim before finalization
-    ✓ Second burner commits to reach hard cap
-    ✓ Creator finalizes presale (hard cap reached)
-    ✓ Participant claims tokens with secret (anonymous claim)
-    ✓ Cannot double-claim
-    ✓ Wrong secret fails verification
-```
+An observer sees: wallet A sent SOL to relayer R. Separately, relayer R swapped SOL for token T. Separately, a new wallet S received token T. They cannot prove A and S belong to the same person.
 
 ---
 
 ## License
 
 MIT
-# Baserk
