@@ -4,6 +4,22 @@ Dara is a mainnet Solana privacy toolkit that breaks the on-chain link between y
 
 **Network:** Solana Mainnet
 
+> **📹 [Watch Demo Video](https://x.com/olathepavilion/status/2018290968974254230)** | **🎬 [View Pitch Deck](https://dara-six.vercel.app/pitch.html)** | **🚀 [Try Live App](https://dara-six.vercel.app)**
+
+---
+
+## Live Mainnet Proof
+
+All features have been tested and verified on Solana Mainnet.
+
+| Action | Details | Proof |
+|--------|---------|-------|
+| **Token Launch** | DRX — `FDdocTzx55am...doge` | [View on Solscan ↗](https://solscan.io/tx/2yGx9HVc6fJKr2Vw52biokqN2pJJBiNEMyCBkGQpDA4oha8H76RQnQwnufpJRKkdaz9wPA4tfwQSKNxpR8tF9CpM) |
+| **Anonymous Swap** | SOL → USDC | [View on Solscan ↗](https://solscan.io/tx/2oSRnMSUPLq1ynW4qYn5LcRVVBRvbGDhMdb6qS2CxPiTwH2LoVD6kMv5WCUUBQaqjdJyj1WGbw5EtFSqyufHiMcX) |
+| **Pre-Buy** | Stealth wallet created | [View on Solscan ↗](https://solscan.io/tx/2yGx9HVc6fJKr2Vw52biokqN2pJJBiNEMyCBkGQpDA4oha8H76RQnQwnufpJRKkdaz9wPA4tfwQSKNxpR8tF9CpM) |
+
+**Key proof:** Check the swap transaction — the signer is the relayer (`61jfZuYGSY9RCmRXQnCqjuHmeudXVv1USQm89NoGF5ee`), NOT the user's wallet. No on-chain link.
+
 ---
 
 ## How It Works
@@ -35,17 +51,12 @@ Your wallet sends SOL to the relayer. The relayer executes the Jupiter swap from
 
 ## Features
 
-### Anonymous Swap
-Jupiter swaps executed via a server-side relayer. Your connected wallet deposits SOL, but the actual swap transaction only contains the relayer's address. Tokens land in a fresh stealth wallet.
-
-### Stealth Token Launch + Pre-Buy
-Create a token via the Anoncoin API and immediately execute distributed pre-buys across 1-5 stealth wallets. Each wallet gets its own keypair — distributed holding from block zero.
-
-### AI Token Risk Analysis
-Before you swap, Dara fetches on-chain data (holder concentration, mint authority, freeze authority, supply distribution) and runs it through GPT-4o-mini for a risk assessment. Flags rug-pull indicators and blocks swaps on tokens scoring 90+ risk.
-
-### Stealth Wallet Manager
-Full UI for managing stealth wallets — view SOL and token balances, copy/reveal private keys, sweep all assets to a destination, import external wallets, and export keys for Phantom import. Not just a text dump of private keys.
+| Feature | Description |
+|---------|-------------|
+| **Anonymous Swap** | Jupiter swaps via relayer — your wallet never in the tx |
+| **Stealth Token Launch** | Create token via Anoncoin + instant pre-buy into stealth wallets |
+| **AI Risk Analysis** | GPT-powered rug detection before you swap |
+| **Wallet Manager** | Manage stealth wallets with balances, export keys, sweep assets |
 
 ---
 
@@ -158,33 +169,6 @@ Open `http://localhost:3000` and connect a Solana wallet on mainnet.
 2. View all stealth wallets with live SOL and token balances
 3. Actions: reveal/copy private key, sweep all assets, import external wallets
 4. Follow the Phantom import instructions to access tokens in your mobile wallet
-
----
-
-## Live Mainnet Proof
-
-All features have been tested and verified on Solana Mainnet.
-
-### Token Launched
-| Field | Value |
-|-------|-------|
-| **Name** | DRX |
-| **Mint Address** | [`FDdocTzx55am284MmEq5HN6e4EnaJwdePWB1YWvfdoge`](https://solscan.io/token/FDdocTzx55am284MmEq5HN6e4EnaJwdePWB1YWvfdoge) |
-| **Deploy Tx** | [`2yGx9HVc...9CpM`](https://solscan.io/tx/2yGx9HVc6fJKr2Vw52biokqN2pJJBiNEMyCBkGQpDA4oha8H76RQnQwnufpJRKkdaz9wPA4tfwQSKNxpR8tF9CpM) |
-
-### Anonymous Swap Completed
-| Field | Value |
-|-------|-------|
-| **Swap** | SOL → USDC |
-| **Tx Signature** | [`2oSRnMSU...HiMcX`](https://solscan.io/tx/2oSRnMSUPLq1ynW4qYn5LcRVVBRvbGDhMdb6qS2CxPiTwH2LoVD6kMv5WCUUBQaqjdJyj1WGbw5EtFSqyufHiMcX) |
-| **Signer** | Relayer (`61jfZuYGSY9RCmRXQnCqjuHmeudXVv1USQm89NoGF5ee`) — **NOT** the user's wallet |
-
-### Pre-Buy Stealth Wallet
-| Field | Value |
-|-------|-------|
-| **Token** | DRX |
-| **Pre-Buy Tx** | [`2yGx9HVc...9CpM`](https://solscan.io/tx/2yGx9HVc6fJKr2Vw52biokqN2pJJBiNEMyCBkGQpDA4oha8H76RQnQwnufpJRKkdaz9wPA4tfwQSKNxpR8tF9CpM) |
-| **Stealth Wallet** | Created with private key — user imports to Phantom |
 
 ---
 
