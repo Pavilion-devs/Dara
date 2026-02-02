@@ -1,8 +1,9 @@
 export const MAINNET_RPC_URL =
   process.env.NEXT_PUBLIC_SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com";
 
-export const JUPITER_QUOTE_URL = "https://quote-api.jup.ag/v6/quote";
-export const JUPITER_SWAP_URL = "https://quote-api.jup.ag/v6/swap";
+// Jupiter Ultra API (v1) - public endpoint
+export const JUPITER_QUOTE_URL = "https://lite-api.jup.ag/swap/v1/quote";
+export const JUPITER_SWAP_URL = "https://lite-api.jup.ag/swap/v1/swap";
 
 export const SOL_MINT = "So11111111111111111111111111111111111111112";
 

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dara — Privacy Toolkit for Solana</title>
+    
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=clash-display@600,700&display=swap">
+    
+    <style>
+        /* ===========================================
+           THEME
+           =========================================== */
+        :root {
+            --bg-primary: #fdfdfc;
+            --bg-dark: #111111;
+            --text-primary: #171717;
+            --text-secondary: #525252;
+            --text-muted: #a3a3a3;
+            --accent: #6366f1;
+            --accent-light: #e0e7ff;
+            --border: #e5e5e5;
+            
+            --font-display: 'Clash Display', sans-serif;
+            --font-body: 'Satoshi', sans-serif;
+            
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* ===========================================
+           BASE
+           =========================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-snap-type: y mandatory;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ===========================================
+           SLIDE STRUCTURE
+           =========================================== */
+        .slide {
+            min-height: 100vh;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: clamp(2rem, 8vw, 6rem);
+            position: relative;
+        }
+
+        .slide--dark {
+            background: var(--bg-dark);
+            color: white;
+        }
+
+        .slide--accent {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+        }
+
+        /* ===========================================
+           TYPOGRAPHY
+           =========================================== */
+        .display {
+            font-family: var(--font-display);
+            font-size: clamp(3rem, 10vw, 7rem);
+            font-weight: 700;
+            line-height: 1.05;
+            letter-spacing: -0.03em;
+        }
+
+        .headline {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 6vw, 4rem);
+            font-weight: 600;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .subhead {
+            font-size: clamp(1.125rem, 2.5vw, 1.5rem);
+            color: var(--text-secondary);
+            max-width: 600px;
+        }
+
+        .slide--dark .subhead,
+        .slide--accent .subhead {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+        }
+
+        .slide--dark .label {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* ===========================================
+           COMPONENTS
+           =========================================== */
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 1.5rem;
+            padding: 2rem;
+        }
+
+        .card--dark {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--accent-light);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .slide--dark .feature-icon {
+            background: rgba(99, 102, 241, 0.2);
+        }
+
+        .feature-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .slide--dark .feature-desc {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--accent-light);
+            color: var(--accent);
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .slide--dark .tag {
+            background: rgba(99, 102, 241, 0.2);
+            color: #a5b4fc;
+        }
+
+        /* Architecture diagram */
+        .arch-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 700px;
+            margin: 2rem auto 0;
+        }
+
+        .arch-step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+        }
+
+        .arch-num {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .arch-arrow {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 1.5rem;
+        }
+
+        /* Proof table */
+        .proof-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+
+        .proof-table th,
+        .proof-table td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .proof-table th {
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 500;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .proof-table td {
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+
+        .proof-table a {
+            color: #a5b4fc;
+            text-decoration: none;
+        }
+
+        .proof-table a:hover {
+            text-decoration: underline;
+        }
+
+        /* Tech stack */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .tech-item {
+            padding: 1.25rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1rem;
+        }
+
+        .tech-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.4);
+            margin-bottom: 0.25rem;
+        }
+
+        .tech-value {
+            font-weight: 600;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s var(--ease-out-expo), 
+                        transform 0.8s var(--ease-out-expo);
+        }
+
+        .slide.visible .reveal {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .delay-1 { transition-delay: 0.1s; }
+        .delay-2 { transition-delay: 0.2s; }
+        .delay-3 { transition-delay: 0.3s; }
+        .delay-4 { transition-delay: 0.4s; }
+        .delay-5 { transition-delay: 0.5s; }
+
+        /* ===========================================
+           NAVIGATION
+           =========================================== */
+        .nav-dots {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.2);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-dot.active {
+            background: var(--accent);
+            transform: scale(1.3);
+        }
+
+        .slide--dark + .nav-dots .nav-dot,
+        .slide--accent + .nav-dots .nav-dot {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ===========================================
+           RESPONSIVE
+           =========================================== */
+        @media (max-width: 768px) {
+            .nav-dots {
+                display: none;
+            }
+            
+            .arch-flow {
+                font-size: 0.875rem;
+            }
+            
+            .proof-table {
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Dots -->
+    <nav class="nav-dots" id="nav">
+        <button class="nav-dot active" data-slide="0"></button>
+        <button class="nav-dot" data-slide="1"></button>
+        <button class="nav-dot" data-slide="2"></button>
+        <button class="nav-dot" data-slide="3"></button>
+        <button class="nav-dot" data-slide="4"></button>
+        <button class="nav-dot" data-slide="5"></button>
+    </nav>
+
+    <!-- Slide 1: Title -->
+    <section class="slide" id="slide-0">
+        <div class="reveal">
+            <p class="label">Anoncoin Privacy Hackathon</p>
+        </div>
+        <h1 class="display reveal delay-1" style="margin-top: 1rem;">
+            Dara
+        </h1>
+        <p class="subhead reveal delay-2" style="margin-top: 1.5rem;">
+            Privacy Toolkit for Solana.<br>
+            Anonymous swaps. Stealth launches. AI-powered protection.
+        </p>
+        <div class="reveal delay-3" style="margin-top: 2rem;">
+            <span class="tag">Live on Mainnet</span>
+        </div>
+    </section>
+
+    <!-- Slide 2: Problem -->
+    <section class="slide slide--dark" id="slide-1">
+        <p class="label reveal">The Problem</p>
+        <h2 class="headline reveal delay-1" style="margin-top: 1rem;">
+            Every trade you make is public.
+        </h2>
+        <p class="subhead reveal delay-2" style="margin-top: 1.5rem;">
+            Wallet watchers track your moves. Snipers front-run your launches. 
+            MEV bots exploit your trades. Your on-chain history tells your entire story.
+        </p>
+        <div class="grid-3 reveal delay-3">
+            <div class="card card--dark">
+                <div class="feature-title">Wallet Tracking</div>
+                <div class="feature-desc">Copy traders follow profitable wallets. Your alpha is everyone's alpha.</div>
+            </div>
+            <div class="card card--dark">
+                <div class="feature-title">Sniper Bots</div>
+                <div class="feature-desc">Launch a token and bots buy before you can. Your own creation, front-run.</div>
+            </div>
+            <div class="card card--dark">
+                <div class="feature-title">Rug Pulls</div>
+                <div class="feature-desc">No way to know if a token is safe before you swap. Hope isn't a strategy.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 3: Solution -->
+    <section class="slide" id="slide-2">
+        <p class="label reveal">The Solution</p>
+        <h2 class="headline reveal delay-1" style="margin-top: 1rem;">
+            Break the on-chain link.
+        </h2>
+        <p class="subhead reveal delay-2" style="margin-top: 1.5rem;">
+            Dara uses a server-side relayer to execute your trades. Your wallet deposits SOL, 
+            but the swap transaction only shows the relayer. Tokens land in a fresh stealth wallet.
+        </p>
+        <div class="grid-3 reveal delay-3">
+            <div class="card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent)"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>
+                </div>
+                <div class="feature-title">Anonymous Swap</div>
+                <div class="feature-desc">Jupiter swaps via relayer. Your wallet never appears in the swap transaction.</div>
+            </div>
+            <div class="card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent)"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+                <div class="feature-title">Stealth Launch</div>
+                <div class="feature-desc">Create tokens via Anoncoin + instant pre-buy into multiple stealth wallets.</div>
+            </div>
+            <div class="card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent)"><path d="M12 2a10 10 0 1 0 10 10H12V2z"/><path d="M20 12a8 8 0 1 0-16 0"/><path d="M12 12l6-6"/></svg>
+                </div>
+                <div class="feature-title">AI Risk Analysis</div>
+                <div class="feature-desc">GPT analyzes holder concentration, authorities, and flags rug-pull risks before you swap.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 4: Architecture -->
+    <section class="slide slide--dark" id="slide-3">
+        <p class="label reveal">How It Works</p>
+        <h2 class="headline reveal delay-1" style="margin-top: 1rem;">
+            Relayer Architecture
+        </h2>
+        <div class="arch-flow reveal delay-2">
+            <div class="arch-step">
+                <div class="arch-num">1</div>
+                <div>User wallet deposits SOL to relayer address</div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-step">
+                <div class="arch-num">2</div>
+                <div>Relayer executes Jupiter swap — user wallet NOT in transaction</div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-step">
+                <div class="arch-num">3</div>
+                <div>Swapped tokens transfer to fresh stealth wallet</div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-step">
+                <div class="arch-num">4</div>
+                <div>User imports private key to Phantom — full control</div>
+            </div>
+        </div>
+        <div class="tech-grid reveal delay-3" style="margin-top: 3rem;">
+            <div class="tech-item">
+                <div class="tech-label">Frontend</div>
+                <div class="tech-value">Next.js + React</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-label">Swap</div>
+                <div class="tech-value">Jupiter API</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-label">Token Launch</div>
+                <div class="tech-value">Anoncoin API</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-label">AI</div>
+                <div class="tech-value">OpenAI GPT-4o</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-label">Network</div>
+                <div class="tech-value">Solana Mainnet</div>
+            </div>
+            <div class="tech-item">
+                <div class="tech-label">Database</div>
+                <div class="tech-value">None (localStorage)</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 5: Live Demo Proof -->
+    <section class="slide slide--dark" id="slide-4">
+        <p class="label reveal">Live Mainnet Proof</p>
+        <h2 class="headline reveal delay-1" style="margin-top: 1rem;">
+            Not a simulation. Real transactions.
+        </h2>
+        <table class="proof-table reveal delay-2">
+            <thead>
+                <tr>
+                    <th>Action</th>
+                    <th>Details</th>
+                    <th>Proof</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="font-family: var(--font-body); font-weight: 600;">Token Launch</td>
+                    <td>DRX — FDdocTzx55am...doge</td>
+                    <td><a href="https://solscan.io/tx/2yGx9HVc6fJKr2Vw52biokqN2pJJBiNEMyCBkGQpDA4oha8H76RQnQwnufpJRKkdaz9wPA4tfwQSKNxpR8tF9CpM" target="_blank">View on Solscan ↗</a></td>
+                </tr>
+                <tr>
+                    <td style="font-family: var(--font-body); font-weight: 600;">Anonymous Swap</td>
+                    <td>SOL → USDC</td>
+                    <td><a href="https://solscan.io/tx/2oSRnMSUPLq1ynW4qYn5LcRVVBRvbGDhMdb6qS2CxPiTwH2LoVD6kMv5WCUUBQaqjdJyj1WGbw5EtFSqyufHiMcX" target="_blank">View on Solscan ↗</a></td>
+                </tr>
+                <tr>
+                    <td style="font-family: var(--font-body); font-weight: 600;">Pre-Buy</td>
+                    <td>Stealth wallet created</td>
+                    <td><a href="https://solscan.io/tx/2yGx9HVc6fJKr2Vw52biokqN2pJJBiNEMyCBkGQpDA4oha8H76RQnQwnufpJRKkdaz9wPA4tfwQSKNxpR8tF9CpM" target="_blank">View on Solscan ↗</a></td>
+                </tr>
+            </tbody>
+        </table>
+        <p class="subhead reveal delay-3" style="margin-top: 2rem; font-size: 1rem;">
+            Check the swap transaction — signer is the relayer wallet, NOT the user's connected wallet. 
+            No on-chain link between user and tokens.
+        </p>
+    </section>
+
+    <!-- Slide 6: Closing -->
+    <section class="slide slide--accent" id="slide-5">
+        <h2 class="display reveal" style="max-width: 900px;">
+            Thank you, Anoncoin.
+        </h2>
+        <p class="subhead reveal delay-1" style="margin-top: 1.5rem; color: rgba(255,255,255,0.85);">
+            Built for the Anoncoin Privacy Hackathon.<br>
+            Privacy should be the default, not the exception.
+        </p>
+        <div class="reveal delay-2" style="margin-top: 3rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+            <span class="tag" style="background: rgba(255,255,255,0.2); color: white;">Dara</span>
+            <span class="tag" style="background: rgba(255,255,255,0.2); color: white;">Solana Mainnet</span>
+            <span class="tag" style="background: rgba(255,255,255,0.2); color: white;">Anoncoin API</span>
+            <span class="tag" style="background: rgba(255,255,255,0.2); color: white;">Jupiter</span>
+            <span class="tag" style="background: rgba(255,255,255,0.2); color: white;">AI-Powered</span>
+        </div>
+    </section>
+
+    <script>
+        // ===========================================
+        // SLIDE VISIBILITY
+        // ===========================================
+        const slides = document.querySelectorAll('.slide');
+        const navDots = document.querySelectorAll('.nav-dot');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    
+                    // Update nav dots
+                    const slideIndex = Array.from(slides).indexOf(entry.target);
+                    navDots.forEach((dot, i) => {
+                        dot.classList.toggle('active', i === slideIndex);
+                    });
+                }
+            });
+        }, { threshold: 0.3 });
+
+        slides.forEach(slide => observer.observe(slide));
+
+        // ===========================================
+        // NAV DOT CLICKS
+        // ===========================================
+        navDots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                const slideIndex = dot.dataset.slide;
+                slides[slideIndex].scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // ===========================================
+        // KEYBOARD NAVIGATION
+        // ===========================================
+        let currentSlide = 0;
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight' || e.key === ' ') {
+                e.preventDefault();
+                currentSlide = Math.min(currentSlide + 1, slides.length - 1);
+                slides[currentSlide].scrollIntoView({ behavior: 'smooth' });
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                currentSlide = Math.max(currentSlide - 1, 0);
+                slides[currentSlide].scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+
+        // Track current slide on scroll
+        const scrollObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    currentSlide = Array.from(slides).indexOf(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        slides.forEach(slide => scrollObserver.observe(slide));
+    </script>
+</body>
+</html>

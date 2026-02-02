@@ -161,6 +161,33 @@ Open `http://localhost:3000` and connect a Solana wallet on mainnet.
 
 ---
 
+## Live Mainnet Proof
+
+All features have been tested and verified on Solana Mainnet.
+
+### Token Launched
+| Field | Value |
+|-------|-------|
+| **Name** | DRX |
+| **Mint Address** | [`FDdocTzx55am284MmEq5HN6e4EnaJwdePWB1YWvfdoge`](https://solscan.io/token/FDdocTzx55am284MmEq5HN6e4EnaJwdePWB1YWvfdoge) |
+| **Deploy Tx** | [`2yGx9HVc...9CpM`](https://solscan.io/tx/2yGx9HVc6fJKr2Vw52biokqN2pJJBiNEMyCBkGQpDA4oha8H76RQnQwnufpJRKkdaz9wPA4tfwQSKNxpR8tF9CpM) |
+
+### Anonymous Swap Completed
+| Field | Value |
+|-------|-------|
+| **Swap** | SOL → USDC |
+| **Tx Signature** | [`2oSRnMSU...HiMcX`](https://solscan.io/tx/2oSRnMSUPLq1ynW4qYn5LcRVVBRvbGDhMdb6qS2CxPiTwH2LoVD6kMv5WCUUBQaqjdJyj1WGbw5EtFSqyufHiMcX) |
+| **Signer** | Relayer (`61jfZuYGSY9RCmRXQnCqjuHmeudXVv1USQm89NoGF5ee`) — **NOT** the user's wallet |
+
+### Pre-Buy Stealth Wallet
+| Field | Value |
+|-------|-------|
+| **Token** | DRX |
+| **Pre-Buy Tx** | [`2yGx9HVc...9CpM`](https://solscan.io/tx/2yGx9HVc6fJKr2Vw52biokqN2pJJBiNEMyCBkGQpDA4oha8H76RQnQwnufpJRKkdaz9wPA4tfwQSKNxpR8tF9CpM) |
+| **Stealth Wallet** | Created with private key — user imports to Phantom |
+
+---
+
 ## Privacy Model
 
 | What's public on-chain | What's private |

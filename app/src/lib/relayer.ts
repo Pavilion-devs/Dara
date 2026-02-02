@@ -23,7 +23,7 @@ export async function sendAndConfirmTx(
   const opts: SendOptions = { skipPreflight: false, preflightCommitment: "confirmed" };
   let signature: string;
 
-  for (let attempt = 0; attempt < 3; attempt++) {
+  for (let attempt = 0; attempt < 5; attempt++) {
     try {
       if (tx instanceof VersionedTransaction) {
         if (signers) {
@@ -45,10 +45,11 @@ export async function sendAndConfirmTx(
       );
       return signature;
     } catch (err) {
-      if (attempt === 2) throw err;
-      await new Promise((r) => setTimeout(r, 1000 * Math.pow(2, attempt)));
+      if (attempt === 4) throw err;
+      const backoff = Math.min(1000 * Math.pow(2, attempt), 8000);
+      await new Promise((r) => setTimeout(r, backoff));
     }
   }
 
-  throw new Error("Failed to send transaction after 3 attempts");
+  throw new Error("Failed to send transaction after 5 attempts");
 }

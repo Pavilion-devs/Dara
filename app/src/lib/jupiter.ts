@@ -98,7 +98,8 @@ export async function transferTokensToStealth(
   relayerKeypair: Keypair,
   tokenMint: PublicKey,
   stealthPubkey: PublicKey,
-  amount: bigint
+  amount: bigint,
+  maxRetries = 8
 ): Promise<string> {
   const relayerAta = getAssociatedTokenAddressSync(
     tokenMint,
@@ -116,42 +117,69 @@ export async function transferTokensToStealth(
     ASSOCIATED_TOKEN_PROGRAM_ID
   );
 
-  const instructions: TransactionInstruction[] = [];
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const instructions: TransactionInstruction[] = [];
 
-  // Create stealth ATA if it doesn't exist
-  try {
-    await getAccount(connection, stealthAta);
-  } catch {
-    instructions.push(
-      createAssociatedTokenAccountInstruction(
-        relayerKeypair.publicKey,
-        stealthAta,
-        stealthPubkey,
-        tokenMint,
-        TOKEN_PROGRAM_ID,
-        ASSOCIATED_TOKEN_PROGRAM_ID
-      )
-    );
+      // Create stealth ATA if it doesn't exist
+      try {
+        await getAccount(connection, stealthAta);
+      } catch {
+        instructions.push(
+          createAssociatedTokenAccountInstruction(
+            relayerKeypair.publicKey,
+            stealthAta,
+            stealthPubkey,
+            tokenMint,
+            TOKEN_PROGRAM_ID,
+            ASSOCIATED_TOKEN_PROGRAM_ID
+          )
+        );
+      }
+
+      // Check relayer balance and use available amount
+      let transferAmount = amount;
+      try {
+        const balanceInfo = await connection.getTokenAccountBalance(relayerAta);
+        const available = BigInt(balanceInfo.value.amount);
+        if (available <= 0n) {
+          // Tokens may still be settling, wait and retry
+          await new Promise((r) => setTimeout(r, 2000));
+          continue;
+        }
+        transferAmount = available < amount ? available : amount;
+      } catch {
+        // ATA might not exist yet, wait for swap to settle
+        await new Promise((r) => setTimeout(r, 2000));
+        continue;
+      }
+
+      instructions.push(
+        createTransferInstruction(
+          relayerAta,
+          stealthAta,
+          relayerKeypair.publicKey,
+          transferAmount,
+          [],
+          TOKEN_PROGRAM_ID
+        )
+      );
+
+      const { blockhash } = await connection.getLatestBlockhash("confirmed");
+      const messageV0 = new TransactionMessage({
+        payerKey: relayerKeypair.publicKey,
+        recentBlockhash: blockhash,
+        instructions,
+      }).compileToV0Message();
+
+      const tx = new VersionedTransaction(messageV0);
+      return await sendAndConfirmTx(connection, tx, [relayerKeypair]);
+    } catch (err) {
+      if (attempt === maxRetries - 1) throw err;
+      const backoff = Math.min(1000 * Math.pow(2, attempt), 10000);
+      await new Promise((r) => setTimeout(r, backoff));
+    }
   }
 
-  instructions.push(
-    createTransferInstruction(
-      relayerAta,
-      stealthAta,
-      relayerKeypair.publicKey,
-      amount,
-      [],
-      TOKEN_PROGRAM_ID
-    )
-  );
-
-  const { blockhash } = await connection.getLatestBlockhash("confirmed");
-  const messageV0 = new TransactionMessage({
-    payerKey: relayerKeypair.publicKey,
-    recentBlockhash: blockhash,
-    instructions,
-  }).compileToV0Message();
-
-  const tx = new VersionedTransaction(messageV0);
-  return sendAndConfirmTx(connection, tx, [relayerKeypair]);
+  throw new Error(`Transfer failed after ${maxRetries} attempts`);
 }

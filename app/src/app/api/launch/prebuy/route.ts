@@ -55,14 +55,16 @@ export async function POST(req: NextRequest) {
     formData.append("twitterLink", twitter || "https://x.com");
     formData.append("telegramLink", telegram || "https://t.me");
 
-    if (imageUrl) {
-      try {
-        const imgRes = await fetch(imageUrl);
-        const blob = await imgRes.blob();
-        formData.append("files", blob, "token-image.png");
-      } catch {
-        // continue without image
-      }
+    // Anoncoin requires an image - use provided URL or a default placeholder
+    const imgSource = imageUrl || "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png";
+    try {
+      const imgRes = await fetch(imgSource);
+      const blob = await imgRes.blob();
+      formData.append("files", blob, "token-image.png");
+    } catch {
+      // If image fetch fails, create a minimal placeholder
+      const placeholder = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", "base64");
+      formData.append("files", new Blob([placeholder], { type: "image/png" }), "token-image.png");
     }
 
     const apiRes = await fetch(ANON_API_URL, {
@@ -83,12 +85,21 @@ export async function POST(req: NextRequest) {
     const { mintAddress, signedTransaction } = tokenData;
 
     // 3. Broadcast the signed token creation tx
-    const txBuf = Buffer.from(signedTransaction, "base64");
-    const deployTx = VersionedTransaction.deserialize(txBuf);
+    // Try base58 first, fall back to base64 if it fails
+    let deployTx: VersionedTransaction;
+    try {
+      const txBuf = bs58.decode(signedTransaction);
+      deployTx = VersionedTransaction.deserialize(txBuf);
+    } catch {
+      // Fallback to base64 encoding
+      const txBuf = Buffer.from(signedTransaction, "base64");
+      deployTx = VersionedTransaction.deserialize(txBuf);
+    }
     const deployTxSig = await sendAndConfirmTx(connection, deployTx);
 
-    // 4. Wait for Jupiter indexing
-    await new Promise((r) => setTimeout(r, 3000));
+    // 4. Wait for Jupiter indexing (new tokens need time to be indexed)
+    // Note: Jupiter may not index new tokens immediately - pre-buys might fail
+    await new Promise((r) => setTimeout(r, 5000));
 
     // 5. Pre-buy into stealth wallets
     const walletCount = Math.min(Math.max(1, numWallets), 5);
@@ -102,16 +113,22 @@ export async function POST(req: NextRequest) {
 
     for (let i = 0; i < walletCount; i++) {
       try {
+        console.log(`Pre-buy ${i + 1}/${walletCount}: Getting quote...`);
+        
         // Get quote
         const quote = await getQuote(SOL_MINT, mintAddress, perWalletLamports, 500);
 
+        console.log(`Pre-buy ${i + 1}/${walletCount}: Executing swap...`);
+        
         // Execute swap via relayer
         const { signature, outputAmount } = await executeRelayerSwap(connection, relayer, quote);
 
         // Generate stealth wallet
         const stealth = Keypair.generate();
 
-        // Transfer tokens to stealth
+        console.log(`Pre-buy ${i + 1}/${walletCount}: Transferring to stealth...`);
+        
+        // Transfer tokens to stealth (with built-in retry logic)
         await transferTokensToStealth(
           connection,
           relayer,
@@ -126,6 +143,13 @@ export async function POST(req: NextRequest) {
           tokenAmount: outputAmount,
           txSig: signature,
         });
+
+        console.log(`Pre-buy ${i + 1}/${walletCount}: Success!`);
+
+        // Delay between buys to let blockchain settle
+        if (i < walletCount - 1) {
+          await new Promise((r) => setTimeout(r, 1500));
+        }
       } catch (err) {
         console.error(`Pre-buy wallet ${i + 1} failed:`, err);
         // Continue with remaining wallets
