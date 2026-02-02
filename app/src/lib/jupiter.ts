@@ -142,7 +142,7 @@ export async function transferTokensToStealth(
       try {
         const balanceInfo = await connection.getTokenAccountBalance(relayerAta);
         const available = BigInt(balanceInfo.value.amount);
-        if (available <= 0n) {
+        if (available <= BigInt(0)) {
           // Tokens may still be settling, wait and retry
           await new Promise((r) => setTimeout(r, 2000));
           continue;

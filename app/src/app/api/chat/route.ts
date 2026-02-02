@@ -42,9 +42,9 @@ async function getTokenAnalysis(mintAddress: string) {
     const totalSupply = BigInt(supply.value.amount);
     
     let concentration = 0;
-    if (totalSupply > 0n) {
-      const topHolderSum = topHolders.reduce((sum, h) => sum + BigInt(h.amount), 0n);
-      concentration = Number((topHolderSum * 100n) / totalSupply);
+    if (totalSupply > BigInt(0)) {
+      const topHolderSum = topHolders.reduce((sum, h) => sum + BigInt(h.amount), BigInt(0));
+      concentration = Number((topHolderSum * BigInt(100)) / totalSupply);
     }
     
     return {
